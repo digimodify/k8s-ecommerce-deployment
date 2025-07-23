@@ -87,7 +87,8 @@ jobs:
             echo "🔍 Checking PHP syntax..."
             
             # Check PHP syntax and look for actual errors
-            PHP_ERRORS=$(find "$APP_DIR" -name "*.php" -exec php -l {} \; 2>&1 | grep -E "(syntax error|Parse error)" || true)
+            PHP_SYNTAX_CHECK=$(find "$APP_DIR" -name "*.php" -exec php -l {} \; 2>&1)
+            PHP_ERRORS=$(echo "$PHP_SYNTAX_CHECK" | grep -E "(syntax error|Parse error)" || true)
             
             if [ -n "$PHP_ERRORS" ]; then
               echo "❌ PHP syntax errors found:"
@@ -95,6 +96,8 @@ jobs:
               exit 1
             else
               echo "✅ No PHP syntax errors found"
+              echo "PHP syntax check output:"
+              echo "$PHP_SYNTAX_CHECK"
             fi
             
             # Verify critical files exist
