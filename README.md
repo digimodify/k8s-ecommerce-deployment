@@ -247,7 +247,6 @@ k8s-ecommerce-deployment/
 ├── docs/                        # 📁 Comprehensive documentation
 │   ├── IMPLEMENTATION.md        # Complete technical deployment guide
 │   ├── PROJECT-METRICS.md       # Project evolution and performance metrics
-│   ├── LEARNING-JOURNEY.md      # Personal transformation story and insights
 │   ├── README.md                # Documentation navigation guide
 │   └── STORAGE.md               # Persistent storage deep dive
 ├── docker/
@@ -394,12 +393,6 @@ This repository includes comprehensive documentation organized in the `docs/` di
 - **Audience**: Stakeholders, project managers, and future maintainers
 - **Highlights**: Success metrics, technical challenges overcome, future roadmap
 
-### ✍️ **[docs/LEARNING-JOURNEY.md](docs/LEARNING-JOURNEY.md)**
-- **Purpose**: Personal narrative of transformation from LAMP to cloud-native
-- **Content**: Learning insights, challenges faced, "aha!" moments, practical advice
-- **Audience**: Developers transitioning to cloud-native, blog readers
-- **Highlights**: Real-world lessons, mindset shifts, career development insights
-
 ### 🗄️ **[docs/STORAGE.md](docs/STORAGE.md)**
 - **Purpose**: Deep dive into persistent storage implementation and monitoring
 - **Content**: Storage architecture, backup strategies, monitoring scripts
@@ -502,8 +495,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 **Built with ❤️ for learning Kubernetes enterprise deployment practices**
 
 **📖 For detailed technical implementation:** [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md)  
-**📊 For project metrics and evolution:** [docs/PROJECT-METRICS.md](docs/PROJECT-METRICS.md)  
-**✍️ For the complete learning journey:** [docs/LEARNING-JOURNEY.md](docs/LEARNING-JOURNEY.md)
+**📊 For project metrics and evolution:** [docs/PROJECT-METRICS.md](docs/PROJECT-METRICS.md)
 
 ## Setup Instructions
 
