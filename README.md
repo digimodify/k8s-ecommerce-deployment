@@ -480,4 +480,4 @@ kubectl get services
 - Modify the `db-load-script.sql` as needed to initialize your database with the required data.
 - Update the database connection strings in the web application to point to the `mysql-service`.
 
-For further details, refer to the individual YAML files and scripts in the project.
+For further details, refer to the individual YAML files and scripts in the project.# CI/CD Pipeline Status: Ready for GitHub Secrets Setup! 🚀
