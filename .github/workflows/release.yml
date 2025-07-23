@@ -230,7 +230,6 @@ jobs:
             releases/*.tgz
           draft: false
           prerelease: false
-          make_latest: 'true'
 
   # ==============================================================================
   # PRODUCTION DEPLOYMENT JOB
@@ -258,8 +257,8 @@ jobs:
         run: |
           echo "🔧 Setting up production Kubernetes context..."
           mkdir -p ~/.kube
-          echo "${{ secrets.PROD_KUBE_CONFIG }}" | base64 -d > ~/.kube/config || {
-            echo "⚠️  PROD_KUBE_CONFIG secret not set - deployment will be simulated"
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > ~/.kube/config || {
+            echo "⚠️  KUBE_CONFIG_DATA secret not set - deployment will be simulated"
             echo "Would deploy to production cluster with:"
             echo "- Release version: ${{ needs.release-build.outputs.version }}"
             echo "- Image: ${{ needs.release-build.outputs.image-tag }}"
@@ -269,7 +268,9 @@ jobs:
         id: deploy
         run: |
           VERSION="${{ needs.release-build.outputs.version }}"
-          IMAGE_TAG="${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${VERSION#v}"
+          # Handle version with or without 'v' prefix
+          VERSION_NUMBER=$(echo "$VERSION" | sed 's/^v//')
+          IMAGE_TAG="${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:$VERSION_NUMBER"
           
           echo "🚀 Deploying $VERSION to production..."
           echo "📦 Using image: $IMAGE_TAG"
