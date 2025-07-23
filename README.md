@@ -11,6 +11,48 @@ This project implements a complete e-commerce application deployment on Kubernet
 - **Production-ready practices**: Rolling updates, rollbacks, scaling strategies
 - **Security best practices**: Externalized configuration, secure credential management
 
+## 🏗️ Architecture & Repository Strategy
+
+This project demonstrates **enterprise-grade separation of concerns** between application code and infrastructure code:
+
+### 📂 **Repository Structure**
+```
+┌─ External App Repository (KodeKloud) ─────────────┐
+│  kodekloudhub/learning-app-ecommerce              │
+│  ├── index.php                                    │
+│  ├── health.php                                   │
+│  ├── css/                                         │
+│  └── config/                                      │
+└────────────────────────────────────────────────────┘
+                           ↓ Dynamic Fetch
+┌─ This Repository (Infrastructure) ─────────────────┐
+│  digimodify/k8s-ecommerce-deployment              │
+│  ├── k8s/                 # Kubernetes manifests  │
+│  ├── docker/              # Container definitions │
+│  ├── .github/workflows/   # CI/CD automation     │
+│  └── ecommerce-app/       # Helm charts          │
+└────────────────────────────────────────────────────┘
+```
+
+### 🔄 **Why This Architecture Matters**
+
+**Professional Benefits:**
+- **Clean Separation**: Infrastructure team ≠ Application team responsibilities
+- **Latest Code**: CI/CD always builds with current application version
+- **Focused Repository**: Each repo has single, clear responsibility
+- **Real-world Pattern**: Mirrors how enterprise platform teams operate
+- **Minimal Footprint**: No duplicate application code stored
+
+**Dynamic Integration Process:**
+1. GitHub Actions triggers on infrastructure changes
+2. Automatically fetches latest application code during build
+3. Builds container with current app version
+4. Deploys with proper versioning and rollback capabilities
+
+This approach demonstrates **production-ready DevOps practices** used by platform engineering teams.
+
+📖 **[Detailed Architecture Documentation →](docs/ARCHITECTURE.md)**
+
 ## 🚀 CI/CD Pipeline
 
 This project includes a comprehensive CI/CD pipeline built with GitHub Actions that automates the entire build, test, and deployment process.
@@ -415,6 +457,34 @@ This repository includes comprehensive documentation organized in the `docs/` di
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## 🎯 Project Status
+
+**Current Status:** ✅ **Production-Ready CI/CD Pipeline Complete**
+
+### ✅ **Accomplished**
+- **Enterprise CI/CD Pipeline**: GitHub Actions with automated testing, building, and deployment
+- **Kubernetes Orchestration**: Complete manifests with ConfigMaps, Secrets, HPA, health probes
+- **Infrastructure as Code**: Helm charts for multi-environment deployment
+- **Security Integration**: Vulnerability scanning, secret detection, quality gates
+- **Professional Documentation**: Comprehensive architecture and implementation guides
+- **Repository Architecture**: Enterprise-grade separation of concerns between app and infrastructure
+
+### 🚀 **Next Phase: AWS EKS Migration**
+**Timeline:** Q4 2025
+- Migrate from local/simulated deployment to production AWS EKS cluster
+- Implement cloud-native features (ALB, EBS storage, IAM roles)
+- Add monitoring and observability stack (Prometheus, Grafana)
+- Set up disaster recovery and backup strategies
+
+### 🏆 **Skills Demonstrated**
+- **Platform Engineering**: Infrastructure automation and developer productivity
+- **DevOps Practices**: CI/CD pipeline design and implementation
+- **Kubernetes Expertise**: Container orchestration and configuration management
+- **Cloud Readiness**: Architecture designed for cloud migration
+- **Professional Development**: Modern tooling and best practices
+
+---
 
 ## 📄 License
 
