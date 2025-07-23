@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-deployment
+  labels:
+    app: ecom-website
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecom-website
+  template:
+    metadata:
+      labels:
+        app: ecom-website
+    spec:
+      containers:
+      - name: ecom-web
+        image: ecom-web:v6
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        # Database credentials from Secret
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: DB_HOST
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: DB_PASSWORD
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: DB_NAME
+        # Legacy feature toggle (keeping for backwards compatibility)
+        - name: FEATURE_DARK_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: feature-toggle-config
+              key: FEATURE_DARK_MODE
+        # Load all app configuration from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: app-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        # Readiness probe - checks if the pod is ready to receive traffic
+        readinessProbe:
+          httpGet:
+            path: /health.php
+            port: 80
+            httpHeaders:
+            - name: User-Agent
+              value: "k8s-readiness-probe"
+          initialDelaySeconds: 5    # Wait 5 seconds before first probe
+          periodSeconds: 5          # Check every 5 seconds
+          timeoutSeconds: 3         # Timeout after 3 seconds
+          successThreshold: 1       # 1 success = ready
+          failureThreshold: 3       # 3 failures = not ready
+        # Liveness probe - checks if the pod should be restarted
+        livenessProbe:
+          httpGet:
+            path: /health.php
+            port: 80
+            httpHeaders:
+            - name: User-Agent
+              value: "k8s-liveness-probe"
+          initialDelaySeconds: 30   # Wait 30 seconds before first probe (allow startup)
+          periodSeconds: 10         # Check every 10 seconds
+          timeoutSeconds: 5         # Timeout after 5 seconds
+          successThreshold: 1       # 1 success = healthy
+          failureThreshold: 3       # 3 failures = restart pod
+        # Startup probe - protects slow-starting containers during initialization
+        startupProbe:
+          httpGet:
+            path: /health.php
+            port: 80
+            httpHeaders:
+            - name: User-Agent
+              value: "k8s-startup-probe"
+          initialDelaySeconds: 10   # Wait 10 seconds before first probe
+          periodSeconds: 5          # Check every 5 seconds
+          timeoutSeconds: 3         # Timeout after 3 seconds
+          successThreshold: 1       # 1 success = startup complete
+          failureThreshold: 6       # 6 failures = 30 seconds of failed startup

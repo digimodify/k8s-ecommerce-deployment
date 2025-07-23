@@ -1,0 +1,31 @@
+apiVersion: v2
+name: ecommerce-app
+description: A comprehensive Helm chart for Kubernetes e-commerce application with MySQL database, persistent storage, and enterprise-grade features
+
+# Application chart for deploying a full-stack e-commerce solution
+# Includes: PHP/Apache web application, MySQL database, persistent storage,
+# configuration management, health monitoring, and auto-scaling capabilities
+type: application
+
+# Chart version - increment when making changes to chart structure or templates
+version: 1.0.0
+
+# Application version - the version of the e-commerce application being deployed
+appVersion: "v6"
+
+# Additional metadata
+home: https://github.com/kodekloudhub/learning-app-ecommerce
+sources:
+  - https://github.com/kodekloudhub/learning-app-ecommerce
+keywords:
+  - ecommerce
+  - php
+  - mysql
+  - kubernetes
+  - web-application
+maintainers:
+  - name: KodeKloud
+    email: support@kodekloud.com
+annotations:
+  category: Web Application
+  licenses: Apache-2.0

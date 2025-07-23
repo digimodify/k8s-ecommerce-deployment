@@ -1,0 +1,235 @@
+# Default values for ecommerce-app Helm Chart
+# This is a YAML-formatted file.
+# Declare variables to be substituted into your templates.
+
+# Global configuration
+global:
+  # ImagePullPolicy for all images
+  imagePullPolicy: IfNotPresent
+  # Storage class for persistent volumes
+  storageClass: "standard"
+
+# Web application configuration
+webapp:
+  # Number of replicas for the web application
+  replicaCount: 2
+  
+  image:
+    repository: ecom-web
+    tag: "v7"
+    pullPolicy: IfNotPresent
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+    name: http
+  
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  # Health probes configuration
+  healthProbes:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /health.php
+        port: 80
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /health.php
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+    startupProbe:
+      httpGet:
+        path: /health.php
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 30
+  
+  # Environment variables
+  env:
+    # Database connection settings (injected from secrets and configmaps)
+    dbHost: "mysql-service"
+    dbPort: "3306"
+    # Additional environment variables can be added here
+
+# MySQL database configuration
+mysql:
+  enabled: true
+  
+  image:
+    repository: mysql
+    tag: "8.0"
+    pullPolicy: IfNotPresent
+  
+  # Database credentials (will be stored in Kubernetes secrets)
+  auth:
+    rootPassword: "root123"
+    database: "ecomdb"
+    username: "ecomuser"
+    password: "ecompassword"
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 3306
+    name: mysql
+  
+  # Persistent storage configuration
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: "standard"
+    accessMode: ReadWriteOnce
+  
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  
+  # MySQL configuration
+  config:
+    # Custom MySQL configuration can be added here
+    maxConnections: 100
+
+# Configuration management
+config:
+  # Application configuration
+  app:
+    siteName: "E-Commerce Store"
+    environment: "production"
+    debugMode: false
+    timezone: "UTC"
+    # Feature toggles
+    features:
+      darkMode: true
+      promotionalBanner: true
+      advancedSearch: false
+  
+  # Feature toggles (separate configmap)
+  featureToggles:
+    darkMode: true
+
+# Horizontal Pod Autoscaler configuration
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  # targetMemoryUtilizationPercentage: 80
+
+# Service Account configuration
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Security context
+securityContext:
+  # Security context for pods
+  pod:
+    fsGroup: 2000
+  
+  # Security context for containers
+  container:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 1000
+    capabilities:
+      drop:
+      - ALL
+
+# Network policies (if supported)
+networkPolicy:
+  enabled: false
+  # ingress: []
+  # egress: []
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: ecommerce.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: ecommerce-tls
+  #    hosts:
+  #      - ecommerce.local
+
+# Node selector, tolerations, and affinity
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: 50%
+
+# Monitoring and observability
+monitoring:
+  enabled: false
+  # ServiceMonitor for Prometheus
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    scrapeTimeout: 10s
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "7d"
+
+# Additional labels to apply to all resources
+labels: {}
+
+# Additional annotations to apply to all resources
+annotations: {}
+
+# Init containers (if needed)
+initContainers: []
+
+# Additional volumes
+extraVolumes: []
+
+# Additional volume mounts
+extraVolumeMounts: []
+
+# Additional containers (sidecars)
+extraContainers: []

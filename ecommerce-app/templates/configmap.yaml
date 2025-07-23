@@ -1,0 +1,98 @@
+---
+# Application Configuration ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-app-config
+  labels:
+    {{- include "ecommerce-app.labels" . | nindent 4 }}
+data:
+  SITE_NAME: {{ .Values.config.app.siteName | quote }}
+  ENVIRONMENT: {{ .Values.config.app.environment | quote }}
+  DEBUG_MODE: {{ .Values.config.app.debugMode | quote }}
+  TIMEZONE: {{ .Values.config.app.timezone | quote }}
+  FEATURE_PROMOTIONAL_BANNER: {{ .Values.config.app.features.promotionalBanner | quote }}
+  FEATURE_ADVANCED_SEARCH: {{ .Values.config.app.features.advancedSearch | quote }}
+
+---
+# Feature Toggles ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-feature-toggle-config
+  labels:
+    {{- include "ecommerce-app.labels" . | nindent 4 }}
+data:
+  FEATURE_DARK_MODE: {{ .Values.config.featureToggles.darkMode | quote }}
+
+---
+# MySQL Initialization Script ConfigMap
+{{- if .Values.mysql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-mysql-init-script
+  labels:
+    {{- include "ecommerce-app.labels" . | nindent 4 }}
+data:
+  db-load-script.sql: |
+    -- E-Commerce Database Initialization Script
+    -- Create products table
+    CREATE TABLE IF NOT EXISTS products (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        price DECIMAL(10, 2) NOT NULL,
+        description TEXT,
+        image_url VARCHAR(500),
+        category VARCHAR(100),
+        stock_quantity INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+
+    -- Create categories table
+    CREATE TABLE IF NOT EXISTS categories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Create users table (for future use)
+    CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Insert sample data
+    INSERT INTO categories (name, description) VALUES 
+    ('Electronics', 'Electronic devices and gadgets'),
+    ('Clothing', 'Fashion and apparel'),
+    ('Books', 'Books and educational materials'),
+    ('Home & Garden', 'Home improvement and gardening')
+    ON DUPLICATE KEY UPDATE description=VALUES(description);
+
+    INSERT INTO products (name, price, description, image_url, category, stock_quantity) VALUES 
+    ('Laptop Computer', 999.99, 'High-performance laptop for work and gaming', '/img/c-1.png', 'Electronics', 50),
+    ('Smartphone', 699.99, 'Latest smartphone with advanced features', '/img/c-2.png', 'Electronics', 100),
+    ('T-Shirt', 19.99, 'Comfortable cotton t-shirt', '/img/c-3.png', 'Clothing', 200),
+    ('Programming Book', 49.99, 'Learn programming with this comprehensive guide', '/img/c-4.png', 'Books', 75),
+    ('Garden Tools Set', 89.99, 'Complete set of gardening tools', '/img/c-5.png', 'Home & Garden', 30),
+    ('Wireless Headphones', 199.99, 'Premium wireless headphones with noise cancellation', '/img/c-6.png', 'Electronics', 80),
+    ('Running Shoes', 129.99, 'Comfortable running shoes for athletes', '/img/c-7.png', 'Clothing', 150),
+    ('Coffee Maker', 159.99, 'Automatic coffee maker for perfect brew', '/img/c-8.png', 'Home & Garden', 40)
+    ON DUPLICATE KEY UPDATE 
+    price=VALUES(price), 
+    description=VALUES(description), 
+    image_url=VALUES(image_url), 
+    category=VALUES(category), 
+    stock_quantity=VALUES(stock_quantity);
+
+    -- Create indexes for better performance
+    CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+    CREATE INDEX IF NOT EXISTS idx_products_price ON products(price);
+    CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name);
+{{- end }}

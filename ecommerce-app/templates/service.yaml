@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}
+  labels:
+    {{- include "ecommerce-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: webapp
+spec:
+  type: {{ .Values.webapp.service.type }}
+  ports:
+    - port: {{ .Values.webapp.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: {{ .Values.webapp.service.name }}
+  selector:
+    {{- include "ecommerce-app.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: webapp

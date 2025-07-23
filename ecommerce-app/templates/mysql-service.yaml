@@ -1,0 +1,19 @@
+{{- if .Values.mysql.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-mysql-service
+  labels:
+    {{- include "ecommerce-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+spec:
+  type: {{ .Values.mysql.service.type }}
+  ports:
+  - port: {{ .Values.mysql.service.port }}
+    targetPort: mysql
+    protocol: TCP
+    name: {{ .Values.mysql.service.name }}
+  selector:
+    {{- include "ecommerce-app.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+{{- end }}

@@ -1,0 +1,58 @@
+# Kubernetes and Docker
+*.log
+.kube/
+kubeconfig*
+.env
+.env.local
+.env.production
+
+# Helm
+charts/*.tgz
+requirements.lock
+
+# IDE and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Secrets and sensitive data
+secrets/
+*.key
+*.pem
+*.crt
+config.local.*
+
+# Database backups (keep example)
+backups/*.sql
+!backups/backup_20250722_104911.sql
+
+# Node modules (if any JS tools added)
+node_modules/
+
+# Python (if any Python tools added)
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Archives
+*.tar.gz
+*.zip
+*.tgz
+!releases/*.tgz

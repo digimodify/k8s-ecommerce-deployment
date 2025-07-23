@@ -1,0 +1,47 @@
+# Development Environment Values
+# Override default values for development environment
+
+webapp:
+  replicaCount: 1
+  image:
+    tag: "v6"
+    pullPolicy: Always
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+mysql:
+  persistence:
+    size: 500Mi
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+config:
+  app:
+    environment: "development"
+    debugMode: true
+    features:
+      darkMode: true
+      promotionalBanner: false
+      advancedSearch: true
+
+autoscaling:
+  enabled: false
+
+securityContext:
+  pod:
+    fsGroup: 2000
+  container:
+    runAsUser: 1000
+    runAsNonRoot: true

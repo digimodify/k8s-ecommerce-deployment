@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}
+  labels:
+    {{- include "ecommerce-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: webapp
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.webapp.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ecommerce-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: webapp
+  template:
+    metadata:
+      {{- with .Values.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ecommerce-app.selectorLabels" . | nindent 8 }}
+        {{- with .Values.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        app.kubernetes.io/component: webapp
+    spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "ecommerce-app.serviceAccountName" . }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.securityContext.pod | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext.container | nindent 12 }}
+          image: "{{ .Values.webapp.image.repository }}:{{ .Values.webapp.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.webapp.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.webapp.service.targetPort }}
+              protocol: TCP
+          env:
+            # Database connection from secrets
+            - name: DB_HOST
+              value: {{ include "ecommerce-app.fullname" . }}-mysql-service
+            - name: DB_PORT
+              value: {{ .Values.mysql.service.port | quote }}
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-mysql-credentials
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-mysql-credentials
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-mysql-credentials
+                  key: DB_PASSWORD
+            # Application configuration from ConfigMaps
+            - name: SITE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-app-config
+                  key: SITE_NAME
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-app-config
+                  key: ENVIRONMENT
+            - name: DEBUG_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-app-config
+                  key: DEBUG_MODE
+            - name: FEATURE_DARK_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-feature-toggle-config
+                  key: FEATURE_DARK_MODE
+            - name: FEATURE_PROMOTIONAL_BANNER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-app-config
+                  key: FEATURE_PROMOTIONAL_BANNER
+            - name: FEATURE_ADVANCED_SEARCH
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce-app.fullname" . }}-app-config
+                  key: FEATURE_ADVANCED_SEARCH
+          {{- if .Values.webapp.healthProbes.enabled }}
+          livenessProbe:
+            {{- toYaml .Values.webapp.healthProbes.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.webapp.healthProbes.readinessProbe | nindent 12 }}
+          startupProbe:
+            {{- toYaml .Values.webapp.healthProbes.startupProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.webapp.resources | nindent 12 }}
+          {{- with .Values.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
