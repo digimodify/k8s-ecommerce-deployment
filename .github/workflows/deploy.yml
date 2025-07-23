@@ -47,7 +47,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -113,7 +113,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: ../
+          context: .
           file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
@@ -255,7 +255,7 @@ jobs:
           echo "🚀 Starting deployment process..."
           
           # Update image in deployment manifest
-          NEW_IMAGE="${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          NEW_IMAGE="${{ env.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           echo "📦 Updating image to: $NEW_IMAGE"
           
           # Create deployment directory for this release
