@@ -12,4 +12,6 @@ RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
 # Expose port 80
-EXPOSE 80# Docker build updated Wed Jul 23 15:44:56 EDT 2025
+EXPOSE 80
+
+# Docker build updated Wed Jul 23 15:44:56 EDT 2025
