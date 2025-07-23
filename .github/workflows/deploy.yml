@@ -40,7 +40,13 @@ jobs:
         with:
           submodules: recursive
           
-      - name: 🐳 Set up Docker Buildx
+      - name: � Checkout Learning App
+        uses: actions/checkout@v4
+        with:
+          repository: kodekloudhub/learning-app-ecommerce
+          path: learning-app-ecommerce
+          
+      - name: �🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         
       - name: 🔍 Extract Metadata
@@ -56,6 +62,11 @@ jobs:
       - name: 🧪 Run Application Tests
         run: |
           echo "🧪 Running application health checks..."
+          
+          # Debug: Show current directory structure
+          echo "📂 Current directory structure:"
+          ls -la
+          echo ""
           
           # Check if application directory exists
           if [ -d "learning-app-ecommerce" ]; then
@@ -114,7 +125,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: ../
+          context: .
           file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: false
@@ -149,6 +160,12 @@ jobs:
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v4
+        
+      - name: 📥 Checkout Learning App
+        uses: actions/checkout@v4
+        with:
+          repository: kodekloudhub/learning-app-ecommerce
+          path: learning-app-ecommerce
         
       - name: 🎛️ Setup kubectl
         uses: azure/setup-kubectl@v3
@@ -213,6 +230,12 @@ jobs:
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v4
+        
+      - name: 📥 Checkout Learning App
+        uses: actions/checkout@v4
+        with:
+          repository: kodekloudhub/learning-app-ecommerce
+          path: learning-app-ecommerce
         
       - name: 🎛️ Setup kubectl
         uses: azure/setup-kubectl@v3
