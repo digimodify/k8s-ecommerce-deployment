@@ -144,6 +144,22 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           
+      - name: 🐛 Debug Docker Build Context
+        run: |
+          echo "🐛 Debugging Docker build context..."
+          echo "Current directory contents:"
+          ls -la
+          echo ""
+          echo "learning-app-ecommerce directory contents:"
+          ls -la learning-app-ecommerce/ || echo "learning-app-ecommerce directory not found"
+          echo ""
+          echo "Key files check:"
+          echo "- learning-app-ecommerce/index.php exists: $(test -f learning-app-ecommerce/index.php && echo 'YES' || echo 'NO')"
+          echo "- learning-app-ecommerce/health.php exists: $(test -f learning-app-ecommerce/health.php && echo 'YES' || echo 'NO')"
+          echo ""
+          echo "Dockerfile contents:"
+          cat docker/Dockerfile
+          
       - name: 📊 Image Security Scan
         if: github.event_name != 'pull_request'
         run: |
