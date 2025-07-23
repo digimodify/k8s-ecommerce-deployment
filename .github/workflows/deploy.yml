@@ -85,7 +85,17 @@ jobs:
           # Basic syntax check for PHP files
           if command -v php &> /dev/null; then
             echo "🔍 Checking PHP syntax..."
-            find "$APP_DIR" -name "*.php" -exec php -l {} \; 2>&1 | grep -E "(syntax error|Parse error)" && exit 1 || echo "✅ No PHP syntax errors found"
+            
+            # Check PHP syntax and look for actual errors
+            PHP_ERRORS=$(find "$APP_DIR" -name "*.php" -exec php -l {} \; 2>&1 | grep -E "(syntax error|Parse error)" || true)
+            
+            if [ -n "$PHP_ERRORS" ]; then
+              echo "❌ PHP syntax errors found:"
+              echo "$PHP_ERRORS"
+              exit 1
+            else
+              echo "✅ No PHP syntax errors found"
+            fi
             
             # Verify critical files exist
             echo "📋 Verifying application structure..."
