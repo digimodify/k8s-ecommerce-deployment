@@ -337,9 +337,9 @@ helm-uninstall:
 # Build and tag image for CI/CD
 ci-build:
 	@echo "🔨 Building Docker image for CI/CD..."
-	@IMAGE_TAG=${IMAGE_TAG:-latest}; \
-	docker build -f docker/Dockerfile -t ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${IMAGE_NAME}:$$IMAGE_TAG ../
-	@echo "✅ Docker image built: ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+	@IMAGE_TAG=$${IMAGE_TAG:-latest}; \
+	docker build -f docker/Dockerfile -t ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${IMAGE_NAME}:$$IMAGE_TAG .
+	@echo "✅ Docker image built: ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${IMAGE_NAME}:$${IMAGE_TAG:-latest}"
 
 # Push image to registry
 ci-push:
@@ -362,7 +362,7 @@ ci-validate:
 	@echo "🔍 Running CI/CD validation tests..."
 	@echo "Validating Kubernetes manifests..."
 	@for file in k8s/*.yaml; do \
-		if [[ -f "$$file" && -s "$$file" ]]; then \
+		if [ -f "$$file" ] && [ -s "$$file" ]; then \
 			echo "Validating $$file"; \
 			kubectl apply --dry-run=client -f "$$file" || exit 1; \
 		fi; \
@@ -414,7 +414,7 @@ ci-cleanup:
 
 # Set default values for CI/CD variables
 DOCKER_REGISTRY ?= docker.io
-DOCKER_USERNAME ?= your-username
+DOCKER_USERNAME ?= $(shell echo $${DOCKER_HUB_USERNAME:-your-docker-username})
 IMAGE_NAME ?= ecom-web
 IMAGE_TAG ?= latest
 ENVIRONMENT ?= development
